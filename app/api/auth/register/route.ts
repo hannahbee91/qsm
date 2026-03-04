@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { validatePasswordRequirements } from "@/lib/password-utils";
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,6 +9,11 @@ export async function POST(req: NextRequest) {
 
     if (!email || !password || !name) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    const passwordValidation = validatePasswordRequirements(password);
+    if (!passwordValidation.isValid) {
+      return NextResponse.json({ error: "Password does not meet requirements" }, { status: 400 });
     }
 
     const existingUser = await prisma.user.findUnique({

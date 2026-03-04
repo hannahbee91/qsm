@@ -22,9 +22,14 @@ export default async function AdminPage() {
     <div>
       <div className="flex justify-between items-center mb-4">
         <h1 style={{ margin: 0 }}>Admin Dashboard</h1>
-        <Link href="/admin/users" className="btn btn-secondary" style={{ padding: "0.5rem 1rem", fontSize: "0.9rem" }}>
-          Manage Users →
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/settings/password" className="btn btn-primary" style={{ padding: "0.5rem 1rem", fontSize: "0.9rem" }}>
+            Change Password
+          </Link>
+          <Link href="/admin/users" className="btn btn-secondary" style={{ padding: "0.5rem 1rem", fontSize: "0.9rem" }}>
+            Manage Users →
+          </Link>
+        </div>
       </div>
       <AdminDashboard initialEvents={events} />
     </div>

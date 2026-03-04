@@ -22,7 +22,7 @@ function layout(content: string): string {
           <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#1E1E2C;border-radius:13px;overflow:hidden;">
             <tr><td style="padding:32px 32px 24px;text-align:center;">
               <h1 style="margin:0;font-size:24px;font-weight:700;color:#F4F4F8;">
-                <span style="background:${RAINBOW_GRADIENT};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">High Desert</span> Meet
+                <span style="background:${RAINBOW_GRADIENT};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${process.env.NEXT_PUBLIC_APP_NAME || "Queer Speed Meet"}</span>
               </h1>
             </td></tr>
           </table>
@@ -128,5 +128,14 @@ export function matchResultsEmail(event: { title: string }, matches: { name: str
     <p style="margin:0 0 16px;font-size:15px;color:#A1A1B5;">Results for <strong>${event.title}</strong></p>
     ${matchesHtml}
     <p style="margin:20px 0 0;font-size:13px;color:#A1A1B5;text-align:center;">Matches are mutual — both people expressed interest. Have fun connecting! ✨</p>
+  `);
+}
+
+export function passwordResetEmail(resetUrl: string): string {
+  return layout(`
+    <h2 style="margin:24px 0 8px;font-size:20px;color:#FFD93D;">🔒 Password Reset</h2>
+    <p style="margin:0 0 16px;font-size:15px;color:#A1A1B5;">We received a request to reset your password. Click the button below to choose a new one.</p>
+    ${button('Reset Password →', resetUrl)}
+    <p style="margin:20px 0 0;font-size:12px;color:#A1A1B5;text-align:center;">If you did not request this, you can safely ignore this email. The link will expire in 1 hour.</p>
   `);
 }

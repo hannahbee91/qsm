@@ -97,6 +97,12 @@ export default function RegistrantDashboard({ initialUser, initialEvents, pendin
                 <input className="form-input" type="text" value={formData.pronouns} onChange={e => setFormData({...formData, pronouns: e.target.value})} placeholder="e.g. they/them" />
               </div>
             </div>
+
+            <div className="mb-4">
+              <Link href="/settings/password" className="btn btn-outline" style={{ display: 'inline-block', fontSize: "0.9rem", padding: "0.4rem 1rem" }}>
+                Change Password
+              </Link>
+            </div>
             
             <h3 className="mt-2" style={{ fontSize: '1.2rem' }}>Contact Info (For Matches)</h3>
             <p className="form-label mb-2">Provide the methods you prefer to be contacted at if you match with someone.</p>

@@ -5,7 +5,7 @@ import { createContext, useContext, useState, ReactNode } from "react";
 type ModalType = "ALERT" | "CONFIRM" | null;
 
 interface ModalContextType {
-  showAlert: (title: string, message: string) => void;
+  showAlert: (title: string, message: string, onClose?: () => void) => void;
   showConfirm: (title: string, message: string, onConfirm: () => void) => void;
 }
 
@@ -16,10 +16,12 @@ export function ModalProvider({ children }: { children: ReactNode }) {
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
   const [onConfirmCb, setOnConfirmCb] = useState<(() => void) | null>(null);
+  const [onCloseCb, setOnCloseCb] = useState<(() => void) | null>(null);
 
-  const showAlert = (t: string, m: string) => {
+  const showAlert = (t: string, m: string, onClose?: () => void) => {
     setTitle(t);
     setMessage(m);
+    if (onClose) setOnCloseCb(() => onClose);
     setModalType("ALERT");
   };
 
@@ -31,10 +33,14 @@ export function ModalProvider({ children }: { children: ReactNode }) {
   };
 
   const closeModal = () => {
+    if (modalType === "ALERT" && onCloseCb) {
+      onCloseCb();
+    }
     setModalType(null);
     setTitle("");
     setMessage("");
     setOnConfirmCb(null);
+    setOnCloseCb(null);
   };
 
   const handleConfirm = () => {

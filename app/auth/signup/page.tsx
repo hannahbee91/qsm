@@ -1,21 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
+import { validatePasswordRequirements, PasswordValidationResult } from "@/lib/password-utils";
+import { PasswordRequirements } from "@/components/PasswordRequirements";
 
 export default function SignUpPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordValidation, setPasswordValidation] = useState<PasswordValidationResult>(validatePasswordRequirements(""));
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+    setPasswordValidation(validatePasswordRequirements(password));
+  }, [password]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (!passwordValidation.isValid) {
+      setError("Please ensure your password meets all requirements.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -92,9 +111,22 @@ export default function SignUpPage() {
               required 
               disabled={loading}
             />
+            <PasswordRequirements validation={passwordValidation} show={password.length > 0} />
           </div>
 
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
+          <div className="form-group" style={{ textAlign: "left" }}>
+            <label className="form-label">Confirm Password</label>
+            <input 
+              type="password" 
+              className="form-input" 
+              value={confirmPassword} 
+              onChange={e => setConfirmPassword(e.target.value)} 
+              required 
+              disabled={loading}
+            />
+          </div>
+
+          <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading || !passwordValidation.isValid || password !== confirmPassword}>
             {loading ? "Registering..." : "Sign Up"}
           </button>
         </form>
