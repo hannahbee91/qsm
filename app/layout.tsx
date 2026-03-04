@@ -7,8 +7,8 @@ import SignOutButton from "./components/SignOutButton";
 import { ModalProvider } from "./components/ModalProvider";
 
 export const metadata: Metadata = {
-  title: `${process.env.NEXT_PUBLIC_APP_NAME || "Queer Speed Meet"}- Speed Dating`,
-  description: `${process.env.NEXT_PUBLIC_APP_NAME || "Queer Speed Meet"} Speed Dating Service - Find your person.`,
+  title: `${process.env.NEXT_PUBLIC_APP_NAME || "Queer Speed Meet"}- Speed Meeting`,
+  description: `${process.env.NEXT_PUBLIC_APP_NAME || "Queer Speed Meet"} Speed Meeting Service - Make new connections.`,
 };
 
 export default async function RootLayout({

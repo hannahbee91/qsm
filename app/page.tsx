@@ -26,10 +26,10 @@ export default async function Home() {
       {/* Left Card: Call to Action */}
       <div className="rainbow-border card text-center" style={{ flex: '1 1 400px', maxWidth: '600px', padding: '4rem 2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <h1 className="rainbow-text" style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>
-          Find Your Person
+          Make New Connections
         </h1>
         <p className="mb-4" style={{ fontSize: '1.2rem', color: 'var(--color-text-muted)' }}>
-          Queer Speed Meet is the premier speed dating experience. 
+          Queer Speed Meet is the premier speed meeting experience. 
           Connect authentically in a safe, inclusive, and vibrant environment.
         </p>
         
