@@ -1,36 +1,120 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Queer Speed Meet
 
-## Getting Started
+A custom, responsive speed dating platform built with Next.js App Router.
 
-First, run the development server:
+## Project Structure
+
+| Directory | Description |
+|---|---|
+| `/app` | Next.js App Router — Registrant UI, Admin UI, Event Feedback |
+| `/app/api` | API routes — Auth, User Management, Matchmaking, Events |
+| `/prisma` | PostgreSQL schema and migrations |
+| `docker-compose.yml` | Full-stack deployment (PostgreSQL + app) |
+
+---
+
+## 💻 Local Development
+
+### Prerequisites
+
+- Node.js v20.9.0+
+- Docker & Docker Compose
+
+### 1. Configure Environment
+
+```bash
+cp .env.example .env
+```
+
+Fill in your `.env` — see `.env.example` for all available variables.
+
+### 2. Start the Database
+
+```bash
+docker compose up -d db
+```
+
+> The database runs on port **5433** to avoid conflicts with a local PostgreSQL install.
+
+### 3. Install Dependencies & Migrate
+
+```bash
+npm install
+npx prisma migrate dev
+```
+
+### 4. Run the Dev Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit [http://localhost:3000](http://localhost:3000). On first run you'll be prompted to create an admin user.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🧪 Testing
 
-## Learn More
+### Production Build Check
 
-To learn more about Next.js, take a look at the following resources:
+Verify the app compiles without type errors:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Full-Stack Docker Test
 
-## Deploy on Vercel
+Run the entire stack locally (database + app) to validate the Docker image:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+docker compose up --build
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This builds the app image with the values in your `.env` and starts both the database and the app at [http://localhost:3000](http://localhost:3000).
+
+---
+
+## 🚀 Production Deployment
+
+Deploy on any machine with Docker and Docker Compose installed.
+
+### 1. Clone & Configure
+
+```bash
+git clone <your-repo-url>
+cd qsm
+cp .env.example .env
+```
+
+Edit `.env` with your production values:
+
+- Set `POSTGRES_PASSWORD` to a strong random password
+- Set `NEXTAUTH_SECRET` to a random secret (e.g. `openssl rand -base64 32`)
+- Set `NEXTAUTH_URL` and `AUTH_URL` to your production domain
+- Configure SMTP credentials for email
+- Set `NEXT_PUBLIC_APP_NAME` to your event name
+
+### 2. Start
+
+```bash
+docker compose up -d --build
+```
+
+The app will:
+
+1. Build the Next.js production image (baking in `NEXT_PUBLIC_*` values)
+2. Start PostgreSQL and wait for it to be healthy
+3. Run Prisma migrations automatically
+4. Start the app on port 3000
+
+### 3. Updates
+
+Pull the latest code and rebuild:
+
+```bash
+git pull
+docker compose up -d --build
+```
+
+Migrations run automatically on each container start.

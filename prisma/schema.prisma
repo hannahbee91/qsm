@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          Role      @default(REGISTRANT)
+  age           Int?
+  pronouns      String?
+  suspended     Boolean   @default(false)
+  notifyNewEvents Boolean @default(true)
+  
+  accounts      Account[]
+  sessions      Session[]
+  registrations Registration[]
+  matchResponsesAsSource MatchResponse[] @relation("sourceUser")
+  matchResponsesAsTarget MatchResponse[] @relation("targetUser")
+  
+  discord       String?
+  instagram     String?
+  phoneNumber   String?
+  contactEmail  String?
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+enum Role {
+  ADMIN
+  REGISTRANT
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  date        DateTime
+  address     String?
+  status      EventStatus @default(UPCOMING)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  registrations Registration[]
+  matchResponses MatchResponse[]
+}
+
+enum EventStatus {
+  UPCOMING
+  CANCELLED
+  CLOSED
+}
+
+model Registration {
+  id        String   @id @default(cuid())
+  userId    String
+  eventId   String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+}
+
+model MatchResponse {
+  id              String   @id @default(cuid())
+  sourceUserId    String
+  targetUserId    String
+  eventId         String
+  
+  platonic        Boolean  @default(false)
+  fwb             Boolean  @default(false)
+  monogamous      Boolean  @default(false)
+  nonmonogamous   Boolean  @default(false)
+
+  createdAt       DateTime @default(now())
+
+  sourceUser      User     @relation("sourceUser", fields: [sourceUserId], references: [id], onDelete: Cascade)
+  targetUser      User     @relation("targetUser", fields: [targetUserId], references: [id], onDelete: Cascade)
+  event           Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceUserId, targetUserId, eventId])
+}

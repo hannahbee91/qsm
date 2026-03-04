@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:15
+    env_file:
+      - .env
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-root} -d ${POSTGRES_DB:-qsm}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-}
+        NEXT_PUBLIC_KO_FI_USERNAME: ${NEXT_PUBLIC_KO_FI_USERNAME:-}
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-root}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-qsm}?schema=public
+      - AUTH_TRUST_HOST=true
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

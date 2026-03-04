@@ -1,65 +1,65 @@
-import Image from "next/image";
+import Link from "next/link";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 
-export default function Home() {
+export default async function Home() {
+  const adminCount = await prisma.user.count({ where: { role: "ADMIN" } });
+  if (adminCount === 0) {
+    redirect("/setup");
+  }
+
+  const session = await auth();
+
+  // If already logged in, redirect to the appropriate dashboard
+  if (session?.user) {
+    if (session.user.role === "ADMIN") {
+      redirect("/admin");
+    } else {
+      redirect("/registrant");
+    }
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', justifyContent: 'center', alignItems: 'stretch', marginTop: '4rem', minHeight: '60vh' }}>
+      
+      {/* Left Card: Call to Action */}
+      <div className="rainbow-border card text-center" style={{ flex: '1 1 400px', maxWidth: '600px', padding: '4rem 2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <h1 className="rainbow-text" style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>
+          Find Your Person
+        </h1>
+        <p className="mb-4" style={{ fontSize: '1.2rem', color: 'var(--color-text-muted)' }}>
+          Queer Speed Meet is the premier speed dating experience. 
+          Connect authentically in a safe, inclusive, and vibrant environment.
+        </p>
+        
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
+          <Link href="/auth/signin" className="btn btn-rainbow" style={{ fontSize: '1.2rem', padding: '1rem 2rem' }}>
+            Get Started
+          </Link>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </div>
+      
+      {/* Right Card: Features */}
+      <div className="card rainbow-border text-center" style={{ flex: '1 1 400px', maxWidth: '600px', padding: '3rem 2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <h2 style={{ marginBottom: '2rem' }}>Why {process.env.NEXT_PUBLIC_APP_NAME || "Queer Speed Meet"}?</h2>
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          <div>
+            <h3 style={{ color: 'var(--color-honey-dark)', marginBottom: '0.5rem' }}>Authentic Connections</h3>
+            <p style={{ color: 'var(--color-text-muted)' }}>Meet real people in your area looking for exactly what you're looking for.</p>
+          </div>
+          <div>
+            <h3 style={{ color: 'var(--color-lavender-dark)', marginBottom: '0.5rem' }}>Inclusive Space</h3>
+            <p style={{ color: 'var(--color-text-muted)' }}>We celebrate all identities and orientations with open arms.</p>
+          </div>
+          <div>
+            <h3 style={{ color: '#FF6B6B', marginBottom: '0.5rem' }}>Private & Secure</h3>
+            <p style={{ color: 'var(--color-text-muted)' }}>Your contact info is only shared with mutual matches.</p>
+          </div>
         </div>
-      </main>
+      </div>
+
     </div>
   );
 }
