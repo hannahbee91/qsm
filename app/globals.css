@@ -307,14 +307,217 @@ h3 { font-size: 1.5rem; }
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
 
+/* Responsive layout utilities */
+.responsive-grid-sidebar {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  grid-template-areas: 
+    "schedule manage"
+    "admin manage";
+  gap: 2rem;
+  align-items: start;
+}
+
+.responsive-grid-half {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.responsive-hero {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+  align-items: stretch;
+  margin-top: 4rem;
+  min-height: 60vh;
+}
+
+.responsive-hero > .card {
+  flex: 1 1 400px;
+  max-width: 600px;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.responsive-hero > .card:first-child {
+  padding: 4rem 2rem;
+}
+
+.responsive-flex-stack {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-wrap { flex-wrap: wrap; }
+.flex-col { flex-direction: column; }
+.text-muted { color: var(--color-text-muted); }
+.text-sm { font-size: 0.9rem; }
+
+/* ===== Tablet breakpoint ===== */
 @media (max-width: 768px) {
   main {
     padding: 1.5rem 1rem;
   }
   
   .navbar {
-    padding: 1rem;
+    padding: 0.75rem 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .navbar-brand {
+    font-size: 1.25rem;
+  }
+
+  .navbar-menu {
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.2rem; }
+
+  .responsive-grid-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .responsive-grid-half {
+    grid-template-columns: 1fr;
+  }
+
+  .responsive-hero {
+    margin-top: 2rem;
+    min-height: auto;
+    gap: 1.5rem;
+  }
+
+  .responsive-hero > .card {
+    flex-basis: 100%;
+    max-width: 100%;
+    padding: 2rem 1.5rem;
+  }
+
+  .responsive-hero > .card:first-child {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .responsive-flex-stack {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+
+  .grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== Small mobile breakpoint ===== */
+@media (max-width: 480px) {
+  main {
+    padding: 1rem 0.75rem;
+  }
+
+  .navbar {
+    padding: 0.6rem 0.75rem;
+  }
+
+  .navbar-brand {
+    font-size: 1.1rem;
+  }
+
+  h1 { font-size: 1.6rem; }
+  h2 { font-size: 1.3rem; }
+
+  .btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+
+  .card {
+    padding: 1.25rem;
+    border-radius: var(--radius-md);
+  }
+
+  .responsive-hero > .card {
+    padding: 1.5rem 1rem;
+  }
+
+  .responsive-hero > .card:first-child {
+    padding: 2rem 1rem;
+  }
+
+  .form-input {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.95rem;
+  }
+}
+
+/* Mobile Tabs */
+.mobile-tabs {
+  display: none;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  padding: 0 1rem;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  flex: 1;
+  min-width: 120px;
+  max-width: 200px;
+  padding: 0.75rem 1rem;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-main);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tab-btn.active {
+  border-color: var(--color-honey);
+  color: var(--color-text);
+  background: var(--color-surface-hover);
+  box-shadow: 0 0 0 2px rgba(255, 195, 11, 0.2);
+}
+
+/* On desktop, the tab panel wrappers do not exist for layout purposes */
+.responsive-tab-panel {
+  display: contents;
+}
+
+@media (max-width: 768px) {
+  .mobile-tabs {
+    display: flex;
   }
   
-  h1 { font-size: 2rem; }
+  /* On mobile, only the active panel wrapper displays its children */
+  .responsive-tab-panel {
+    display: none;
+  }
+  
+  .responsive-tab-panel.active {
+    display: block;
+  }
 }
+

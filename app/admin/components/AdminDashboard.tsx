@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useModal } from "@/app/components/ModalProvider";
+import { ResponsiveTabs } from "@/app/components/ResponsiveTabs";
 
 type Event = any;
 
@@ -192,184 +193,202 @@ export default function AdminDashboard({ initialEvents }: { initialEvents: Event
     });
   };
 
-  return (
-    <div className="grid grid-cols-2" style={{ gridTemplateColumns: "1fr 2fr", gap: "2rem", alignItems: "start" }}>
-      <div className="card">
-        <h2>Schedule New Event</h2>
-        <form onSubmit={handleCreateEvent}>
-          <div className="form-group">
-            <label className="form-label">Event Title</label>
-            <input 
-              required
-              className="form-input" 
-              type="text" 
-              value={newEventTitle} 
-              onChange={e => setNewEventTitle(e.target.value)} 
-              placeholder="e.g. June Mixer" 
-            />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Date & Time</label>
-            <input 
-              required
-              className="form-input" 
-              type="datetime-local" 
-              value={newEventDate} 
-              onChange={e => setNewEventDate(e.target.value)} 
-            />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Address <span style={{ fontWeight: 400, color: 'var(--color-text-muted)' }}>(optional)</span></label>
-            <input 
-              className="form-input" 
-              type="text" 
-              value={newEventAddress} 
-              onChange={e => setNewEventAddress(e.target.value)} 
-              placeholder="e.g. 123 Main St, Bend, OR 97701" 
-            />
-          </div>
-          <button className="btn btn-primary" style={{ width: "100%" }} disabled={creating}>
-            {creating ? "Scheduling..." : "Create Event"}
-          </button>
-        </form>
-        
-        <hr style={{ margin: "2rem 0", border: 'none', borderTop: '1px solid var(--color-border)' }} />
-        
-        <h2>Add Administrator</h2>
-        <form onSubmit={handleCreateAdmin}>
-          <div className="form-group">
-            <label className="form-label">Name</label>
-            <input 
-              required
-              className="form-input" 
-              type="text" 
-              value={newAdminName} 
-              onChange={e => setNewAdminName(e.target.value)} 
-            />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Email</label>
-            <input 
-              required
-              className="form-input" 
-              type="email" 
-              value={newAdminEmail} 
-              onChange={e => setNewAdminEmail(e.target.value)} 
-            />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Temporary Password</label>
-            <input 
-              required
-              className="form-input" 
-              type="password" 
-              value={newAdminPassword} 
-              onChange={e => setNewAdminPassword(e.target.value)} 
-            />
-          </div>
-          <button className="btn btn-secondary" style={{ width: "100%" }} disabled={creatingAdmin}>
-            {creatingAdmin ? "Creating..." : "Create Admin Role"}
-          </button>
-        </form>
-      </div>
-
-      <div className="card rainbow-border">
-        <h2>Manage Events</h2>
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          {events.map((event) => {
-            const isExpanded = expandedEventId === event.id;
-            
-            return (
-              <div key={event.id} style={{ border: "1px solid var(--color-border)", padding: "1rem", borderRadius: "var(--radius-sm)" }}>
-                <div className="flex justify-between items-center" style={{ cursor: "pointer" }} onClick={() => toggleExpand(event.id)}>
-                  <div>
-                    <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      {event.title}
-                      <span style={{ 
-                        fontSize: '0.8rem', 
-                        padding: '0.2rem 0.5rem', 
-                        borderRadius: '4px',
-                        backgroundColor: event.status === 'UPCOMING' ? 'var(--color-honey-light)' : (event.status === 'CLOSED' ? 'var(--color-lavender-dark)' : '#ffcccc')
-                      }}>
-                        {event.status}
-                      </span>
-                    </h3>
-                    <p style={{ color: "var(--color-text-muted)", fontSize: '0.9rem' }}>
-                      {new Date(event.date).toLocaleString()} • {event._count.registrations} Registrants • {event._count.matchResponses} Responses
-                    </p>
-                  </div>
-                  <div>
-                    {isExpanded ? "▲" : "▼"}
-                  </div>
-                </div>
-
-                {isExpanded && (
-                  <div className="mt-4" style={{ borderTop: "1px solid var(--color-border)", paddingTop: "1rem" }}>
-                    
-                    {/* Status Controls */}
-                    <div className="flex gap-2 mb-4 flex-wrap">
-                      {event.status !== "CANCELLED" && (
-                        <button onClick={() => handleUpdateStatus(event.id, "CANCELLED")} className="btn btn-outline" style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem", color: 'var(--color-error)', borderColor: 'var(--color-error)' }}>
-                          Mark Cancelled
-                        </button>
-                      )}
-                      
-                      {event.status === "UPCOMING" && (
-                        <button onClick={() => handleUpdateStatus(event.id, "CLOSED")} className="btn btn-outline" style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}>
-                          Mark Closed
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Email Triggers */}
-                    <h4 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>Email Triggers</h4>
-                    <div className="flex gap-2 mb-4 flex-wrap">
-                      <button onClick={() => handleNotify(event.id, "INVITE")} className="btn btn-secondary" style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}>
-                        Send Invites
-                      </button>
-                      <button onClick={() => handleNotify(event.id, "CANCEL")} className="btn btn-secondary" style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}>
-                        Send Cancellation
-                      </button>
-                      <button onClick={() => handleNotify(event.id, "FORM")} className="btn btn-primary" style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}>
-                        Send Feedback Form
-                      </button>
-                      
-                      {event.status === "CLOSED" && (
-                        <button onClick={() => handleEmailResults(event.id)} className="btn btn-rainbow" style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}>
-                          EMAIL MATCH RESULTS
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Registrants List */}
-                    <h4 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>Registrants Management</h4>
-                    {registrantsMap[event.id] ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        {registrantsMap[event.id].map(reg => (
-                          <div key={reg.id} className="flex justify-between items-center" style={{ padding: '0.5rem', background: 'var(--color-surface-hover)', borderRadius: '4px' }}>
-                            <div>
-                                <span style={{ fontWeight: 500 }}>{reg.user.name || reg.user.email}</span>
-                                {reg.user.suspended && <span style={{ marginLeft: '0.5rem', color: 'var(--color-error)', fontSize: '0.8rem' }}>(Suspended)</span>}
-                            </div>
-                            <div className="flex gap-2">
-                                <button onClick={() => handleRemoveRegistration(reg.id)} className="btn btn-outline" style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem', color: 'var(--color-error)', borderColor: 'var(--color-error)' }}>Remove Registration</button>
-                                <button onClick={() => handleSuspendUser(reg.user.id, reg.user.suspended)} className="btn btn-outline" style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem' }}>{reg.user.suspended ? 'Unsuspend User' : 'Suspend User'}</button>
-                            </div>
-                          </div>
-                        ))}
-                        {registrantsMap[event.id].length === 0 && <p className="text-muted text-sm">No registrants yet.</p>}
-                      </div>
-                    ) : (
-                      <p style={{ fontSize: '0.9rem', color: "var(--color-text-muted)", marginBottom: '1rem' }}>Loading registrants...</p>
-                    )}
-                    
-                  </div>
-                )}
-              </div>
-            );
-          })}
+  const tabs = [
+    {
+      id: "schedule",
+      label: "Schedule Event",
+      content: (
+        <div className="card" style={{ gridArea: 'schedule' }}>
+          <h2>Schedule New Event</h2>
+          <form onSubmit={handleCreateEvent}>
+            <div className="form-group">
+              <label className="form-label">Event Title</label>
+              <input 
+                required
+                className="form-input" 
+                type="text" 
+                value={newEventTitle} 
+                onChange={e => setNewEventTitle(e.target.value)} 
+                placeholder="e.g. June Mixer" 
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Date & Time</label>
+              <input 
+                required
+                className="form-input" 
+                type="datetime-local" 
+                value={newEventDate} 
+                onChange={e => setNewEventDate(e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Address <span style={{ fontWeight: 400, color: 'var(--color-text-muted)' }}>(optional)</span></label>
+              <input 
+                className="form-input" 
+                type="text" 
+                value={newEventAddress} 
+                onChange={e => setNewEventAddress(e.target.value)} 
+                placeholder="e.g. 123 Main St, Bend, OR 97701" 
+              />
+            </div>
+            <button className="btn btn-primary" style={{ width: "100%" }} disabled={creating}>
+              {creating ? "Scheduling..." : "Create Event"}
+            </button>
+          </form>
         </div>
-      </div>
-    </div>
+      )
+    },
+    {
+      id: "admin",
+      label: "Add Admin",
+      content: (
+        <div className="card" style={{ gridArea: 'admin' }}>
+          <h2>Add Administrator</h2>
+          <form onSubmit={handleCreateAdmin}>
+            <div className="form-group">
+              <label className="form-label">Name</label>
+              <input 
+                required
+                className="form-input" 
+                type="text" 
+                value={newAdminName} 
+                onChange={e => setNewAdminName(e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Email</label>
+              <input 
+                required
+                className="form-input" 
+                type="email" 
+                value={newAdminEmail} 
+                onChange={e => setNewAdminEmail(e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Temporary Password</label>
+              <input 
+                required
+                className="form-input" 
+                type="password" 
+                value={newAdminPassword} 
+                onChange={e => setNewAdminPassword(e.target.value)} 
+              />
+            </div>
+            <button className="btn btn-secondary" style={{ width: "100%" }} disabled={creatingAdmin}>
+              {creatingAdmin ? "Creating..." : "Create Admin Role"}
+            </button>
+          </form>
+        </div>
+      )
+    },
+    {
+      id: "manage",
+      label: "Manage Events",
+      content: (
+        <div className="card rainbow-border" style={{ gridArea: 'manage' }}>
+          <h2>Manage Events</h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            {events.map((event) => {
+              const isExpanded = expandedEventId === event.id;
+              
+              return (
+                <div key={event.id} style={{ border: "1px solid var(--color-border)", padding: "1rem", borderRadius: "var(--radius-sm)" }}>
+                  <div className="flex justify-between items-center" style={{ cursor: "pointer" }} onClick={() => toggleExpand(event.id)}>
+                    <div>
+                      <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        {event.title}
+                        <span style={{ 
+                          fontSize: '0.8rem', 
+                          padding: '0.2rem 0.5rem', 
+                          borderRadius: '4px',
+                          backgroundColor: event.status === 'UPCOMING' ? 'var(--color-honey-light)' : (event.status === 'CLOSED' ? 'var(--color-lavender-dark)' : '#ffcccc')
+                        }}>
+                          {event.status}
+                        </span>
+                      </h3>
+                      <p style={{ color: "var(--color-text-muted)", fontSize: '0.9rem' }}>
+                        {new Date(event.date).toLocaleString()} • {event._count.registrations} Registrants • {event._count.matchResponses} Responses
+                      </p>
+                    </div>
+                    <div>
+                      {isExpanded ? "▲" : "▼"}
+                    </div>
+                  </div>
+
+                  {isExpanded && (
+                    <div className="mt-4" style={{ borderTop: "1px solid var(--color-border)", paddingTop: "1rem" }}>
+                      
+                      {/* Status Controls */}
+                      <div className="flex gap-2 mb-4 flex-wrap">
+                        {event.status !== "CANCELLED" && (
+                          <button onClick={() => handleUpdateStatus(event.id, "CANCELLED")} className="btn btn-outline" style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem", color: 'var(--color-error)', borderColor: 'var(--color-error)' }}>
+                            Mark Cancelled
+                          </button>
+                        )}
+                        
+                        {event.status === "UPCOMING" && (
+                          <button onClick={() => handleUpdateStatus(event.id, "CLOSED")} className="btn btn-outline" style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}>
+                            Mark Closed
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Email Triggers */}
+                      <h4 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>Email Triggers</h4>
+                      <div className="flex gap-2 mb-4 flex-wrap">
+                        <button onClick={() => handleNotify(event.id, "INVITE")} className="btn btn-secondary" style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}>
+                          Send Invites
+                        </button>
+                        <button onClick={() => handleNotify(event.id, "CANCEL")} className="btn btn-secondary" style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}>
+                          Send Cancellation
+                        </button>
+                        <button onClick={() => handleNotify(event.id, "FORM")} className="btn btn-primary" style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}>
+                          Send Feedback Form
+                        </button>
+                        
+                        {event.status === "CLOSED" && (
+                          <button onClick={() => handleEmailResults(event.id)} className="btn btn-rainbow" style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}>
+                            EMAIL MATCH RESULTS
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Registrants List */}
+                      <h4 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>Registrants Management</h4>
+                      {registrantsMap[event.id] ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                          {registrantsMap[event.id].map(reg => (
+                            <div key={reg.id} className="flex justify-between items-center" style={{ padding: '0.5rem', background: 'var(--color-surface-hover)', borderRadius: '4px' }}>
+                              <div>
+                                  <span style={{ fontWeight: 500 }}>{reg.user.name || reg.user.email}</span>
+                                  {reg.user.suspended && <span style={{ marginLeft: '0.5rem', color: 'var(--color-error)', fontSize: '0.8rem' }}>(Suspended)</span>}
+                              </div>
+                              <div className="flex gap-2">
+                                  <button onClick={() => handleRemoveRegistration(reg.id)} className="btn btn-outline" style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem', color: 'var(--color-error)', borderColor: 'var(--color-error)' }}>Remove Registration</button>
+                                  <button onClick={() => handleSuspendUser(reg.user.id, reg.user.suspended)} className="btn btn-outline" style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem' }}>{reg.user.suspended ? 'Unsuspend User' : 'Suspend User'}</button>
+                              </div>
+                            </div>
+                          ))}
+                          {registrantsMap[event.id].length === 0 && <p className="text-muted text-sm">No registrants yet.</p>}
+                        </div>
+                      ) : (
+                        <p style={{ fontSize: '0.9rem', color: "var(--color-text-muted)", marginBottom: '1rem' }}>Loading registrants...</p>
+                      )}
+                      
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )
+    }
+  ];
+
+  return (
+    <ResponsiveTabs layoutClassName="responsive-grid-sidebar" tabs={tabs} />
   );
 }

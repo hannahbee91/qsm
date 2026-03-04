@@ -82,7 +82,7 @@ export default function AdminUsersManager({ initialUsers }: { initialUsers: User
               placeholder="Search by name or email..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              style={{ width: "250px", padding: "0.4rem 0.75rem", fontSize: "0.9rem" }}
+              style={{ minWidth: "150px", maxWidth: "250px", width: "100%", padding: "0.4rem 0.75rem", fontSize: "0.9rem" }}
             />
             <select
               className="form-input"
@@ -155,7 +155,7 @@ export default function AdminUsersManager({ initialUsers }: { initialUsers: User
                       borderTop: "1px solid var(--color-border)",
                       background: "var(--color-surface-hover)",
                     }}>
-                      <div className="grid grid-cols-2" style={{ gridTemplateColumns: "1fr 1fr", gap: "0.75rem", marginBottom: "1rem" }}>
+                      <div className="responsive-grid-half" style={{ gap: "0.75rem", marginBottom: "1rem" }}>
                         <div>
                           <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted)" }}>Age</span>
                           <p style={{ margin: 0, fontWeight: 500 }}>{user.age ?? "—"}</p>

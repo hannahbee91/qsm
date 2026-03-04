@@ -96,7 +96,7 @@ export default function FeedbackForm({
       
       <div className="grid grid-cols-1 mb-4" style={{ gap: '1rem' }}>
         {participants.map(p => (
-          <div key={p.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-surface-hover)' }}>
+          <div key={p.id} className="responsive-flex-stack" style={{ padding: '1rem', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-surface-hover)' }}>
             <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>
               {p.name || "Unknown"} <span style={{ fontWeight: 400, fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>({p.pronouns || "Ask"})</span>
             </div>
@@ -126,7 +126,7 @@ export default function FeedbackForm({
       <h3 className="mb-2 mt-4" style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem' }}>Contact Info Settings</h3>
       <p className="text-muted mb-2 text-sm">Please verify your contact methods. At least one is required.</p>
       
-      <div className="grid grid-cols-2" style={{ gap: '1rem', gridTemplateColumns: '1fr 1fr' }}>
+      <div className="responsive-grid-half">
         <div className="form-group mb-1">
           <label className="form-label">Email Address</label>
           <input className="form-input" type="email" value={contact.contactEmail} onChange={e => setContact({...contact, contactEmail: e.target.value})} />
