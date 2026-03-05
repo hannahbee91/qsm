@@ -9,13 +9,13 @@ export function generateICS(event: Event): string {
 
   return `BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//${process.env.NEXT_PUBLIC_APP_NAME || "Queer Speed Meet"}//Speed Dating//EN
+PRODID:-//${process.env.NEXT_PUBLIC_APP_NAME || "Queer Speed Meet"}//Speed Meet//EN
 CALSCALE:GREGORIAN
 BEGIN:VEVENT
 SUMMARY:${process.env.NEXT_PUBLIC_APP_NAME || "Queer Speed Meet"}: ${event.title}
 DTSTART:${dtStart}
 DTEND:${dtEnd}${locationLine}
-DESCRIPTION:Speed dating event for ${process.env.NEXT_PUBLIC_APP_NAME || "Queer Speed Meet"}!\n\n${event.address ? `Location: ${event.address}` : ''}
+DESCRIPTION:Speed meet event for ${process.env.NEXT_PUBLIC_APP_NAME || "Queer Speed Meet"}!\n\n${event.address ? `Location: ${event.address}` : ''}
 STATUS:CONFIRMED
 END:VEVENT
 END:VCALENDAR`;

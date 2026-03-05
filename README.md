@@ -1,6 +1,6 @@
 # Queer Speed Meet
 
-A custom, responsive speed dating platform built with Next.js App Router.
+A custom, responsive speed meet platform built with Next.js App Router.
 
 ## Project Structure
 

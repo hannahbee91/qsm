@@ -22,7 +22,7 @@ function layout(content: string): string {
           <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#1E1E2C;border-radius:13px;overflow:hidden;">
             <tr><td style="padding:32px 32px 24px;text-align:center;">
               <h1 style="margin:0;font-size:24px;font-weight:700;color:#F4F4F8;">
-                <span style="background:${RAINBOW_GRADIENT};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${process.env.NEXT_PUBLIC_APP_NAME || "Queer Speed Meet"}</span>
+                <span style="background:${RAINBOW_GRADIENT};color:#14141E;padding:4px 16px;border-radius:8px;display:inline-block;">${process.env.NEXT_PUBLIC_APP_NAME || "Queer Speed Meet"}</span>
               </h1>
             </td></tr>
           </table>
@@ -33,7 +33,7 @@ function layout(content: string): string {
         </td></tr>
         <!-- Footer -->
         <tr><td style="padding:16px 32px 24px;text-align:center;border-top:1px solid #2D2D42;">
-          <p style="margin:0;font-size:12px;color:#A1A1B5;">${process.env.NEXT_PUBLIC_APP_NAME || "Queer Speed Meet"} — Queer Speed Dating</p>
+          <p style="margin:0;font-size:12px;color:#A1A1B5;">${process.env.NEXT_PUBLIC_APP_NAME || "Queer Speed Meet"}</p>
         </td></tr>
       </table>
     </td></tr>
@@ -60,7 +60,7 @@ export function newEventAnnouncementEmail(event: { title: string; date: Date; ad
   const dateStr = event.date.toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' });
   return layout(`
     <h2 style="margin:24px 0 8px;font-size:20px;color:#FFD447;">✨ New Event Announced!</h2>
-    <p style="margin:0 0 16px;font-size:15px;color:#A1A1B5;">A new speed dating event has been scheduled. Sign up before spots fill up!</p>
+    <p style="margin:0 0 16px;font-size:15px;color:#A1A1B5;">A new speed meet event has been scheduled. Sign up before spots fill up!</p>
     <div style="background-color:#262638;border-radius:12px;padding:20px;margin:16px 0;">
       <h3 style="margin:0 0 12px;font-size:18px;color:#F4F4F8;">${event.title}</h3>
       ${infoBox('📅 Date', dateStr)}

@@ -14,7 +14,7 @@ export function HomeClient({ appName }: { appName: string }) {
             Make New Connections
           </h1>
           <p className="mb-4" style={{ fontSize: '1.2rem', color: 'var(--color-text-muted)' }}>
-            Queer Speed Meet is the premier speed meeting experience. 
+            {appName} is the premier speed meeting experience. 
             Connect authentically in a safe, inclusive, and vibrant environment.
           </p>
           

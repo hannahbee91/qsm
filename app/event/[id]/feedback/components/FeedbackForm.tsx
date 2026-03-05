@@ -116,7 +116,7 @@ export default function FeedbackForm({
               </label>
               <label className="flex items-center gap-2" style={{ cursor: 'pointer' }}>
                 <input type="checkbox" checked={responses[p.id].nonmonogamous} onChange={() => handleCheckbox(p.id, "nonmonogamous")} />
-                Nonmonogamous Dating
+                Poly Dating
               </label>
             </div>
           </div>
