@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 1500 500"
+   version="1.1"
+   id="svg8"
+   sodipodi:docname="cover_photo.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview8"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.39984459"
+     inkscape:cx="331.37875"
+     inkscape:cy="132.5515"
+     inkscape:window-width="1600"
+     inkscape:window-height="857"
+     inkscape:window-x="0"
+     inkscape:window-y="38"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg8" />
+  <defs
+     id="defs6">
+    <linearGradient
+       id="rainbowLine"
+       x1="0%"
+       y1="0%"
+       x2="100%"
+       y2="0%">
+      <stop
+         offset="0%"
+         stop-color="#FF6B6B"
+         id="stop1" />
+      <stop
+         offset="20%"
+         stop-color="#FFB471"
+         id="stop2" />
+      <stop
+         offset="40%"
+         stop-color="#FFD93D"
+         id="stop3" />
+      <stop
+         offset="60%"
+         stop-color="#6BCB77"
+         id="stop4" />
+      <stop
+         offset="80%"
+         stop-color="#4D96FF"
+         id="stop5" />
+      <stop
+         offset="100%"
+         stop-color="#A66CFF"
+         id="stop6" />
+    </linearGradient>
+  </defs>
+  <rect
+     width="1500"
+     height="500"
+     fill="#14141E"
+     id="rect6" />
+  <!-- Geometric accents -->
+  <line
+     x1="0"
+     y1="400"
+     x2="1500"
+     y2="100"
+     stroke="#2D2D42"
+     stroke-width="2"
+     id="line6" />
+  <line
+     x1="0"
+     y1="500"
+     x2="1500"
+     y2="0"
+     stroke="#FFC30B"
+     stroke-width="1"
+     opacity="0.3"
+     id="line7" />
+  <circle
+     cx="200"
+     cy="150"
+     r="80"
+     fill="none"
+     stroke="#E6E6FA"
+     stroke-width="2"
+     opacity="0.1"
+     id="circle7" />
+  <circle
+     cx="1300"
+     cy="350"
+     r="150"
+     fill="none"
+     stroke="#FFC30B"
+     stroke-width="4"
+     opacity="0.1"
+     id="circle8" />
+  <!-- Decorative rainbow bar -->
+  <rect
+     x="0"
+     y="490"
+     width="1500"
+     height="10"
+     fill="url(#rainbowLine)"
+     id="rect8" />
+  <!-- Main Title -->
+  <text
+     x="50%"
+     y="52%"
+     font-family="Outfit, sans-serif"
+     font-weight="600"
+     font-size="90px"
+     fill="#ffc30b"
+     dominant-baseline="middle"
+     text-anchor="middle"
+     letter-spacing="2"
+     id="text8">[Chapter Name Here]</text>
+</svg>
