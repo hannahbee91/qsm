@@ -11,7 +11,6 @@ export async function GET() {
 
   try {
     const users = await prisma.user.findMany({
-      where: { role: "REGISTRANT" },
       orderBy: { name: "asc" },
       select: {
         id: true,
@@ -19,6 +18,7 @@ export async function GET() {
         email: true,
         age: true,
         pronouns: true,
+        role: true,
         suspended: true,
         contactEmail: true,
         phoneNumber: true,

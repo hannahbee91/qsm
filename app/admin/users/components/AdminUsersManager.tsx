@@ -10,6 +10,7 @@ type User = {
   email: string | null;
   age: number | null;
   pronouns: string | null;
+  role: string;
   suspended: boolean;
   contactEmail: string | null;
   phoneNumber: string | null;
@@ -42,12 +43,34 @@ export default function AdminUsersManager({ initialUsers }: { initialUsers: User
         });
         if (res.ok) {
           showAlert("Success", `User ${currentStatus ? "unsuspended" : "suspended"}`);
-          await refreshUsers();
+          setUsers(prev => prev.map(u => u.id === userId ? { ...u, suspended: !currentStatus } : u));
         } else {
           showAlert("Error", "Failed to update user");
         }
       } catch {
         showAlert("Error", "Error updating user");
+      }
+    });
+  };
+
+  const handleRoleChange = (userId: string, currentRole: string) => {
+    const newRole = currentRole === "ADMIN" ? "REGISTRANT" : "ADMIN";
+    showConfirm("Confirm", `Are you sure you want to make this user an ${newRole}?`, async () => {
+      try {
+        const res = await fetch(`/api/admin/users/${userId}/role`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ role: newRole }),
+        });
+        if (res.ok) {
+          showAlert("Success", "User role updated");
+          setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u));
+        } else {
+          const data = await res.json();
+          showAlert("Error", data.error || "Failed to update user role");
+        }
+      } catch {
+        showAlert("Error", "Error updating user role");
       }
     });
   };
@@ -140,6 +163,18 @@ export default function AdminUsersManager({ initialUsers }: { initialUsers: User
                           SUSPENDED
                         </span>
                       )}
+                      {user.role === "ADMIN" && (
+                        <span style={{
+                          fontSize: "0.75rem",
+                          padding: "0.15rem 0.4rem",
+                          borderRadius: "4px",
+                          backgroundColor: "rgba(100,200,255,0.15)",
+                          color: "var(--color-primary)",
+                          fontWeight: 600,
+                        }}>
+                          ADMIN
+                        </span>
+                      )}
                     </div>
                     <div className="flex items-center" style={{ gap: "1rem" }}>
                       <span style={{ color: "var(--color-text-muted)", fontSize: "0.85rem" }}>
@@ -193,6 +228,16 @@ export default function AdminUsersManager({ initialUsers }: { initialUsers: User
                           }}
                         >
                           {user.suspended ? "Unsuspend User" : "Suspend User"}
+                        </button>
+                        <button
+                          onClick={() => handleRoleChange(user.id, user.role)}
+                          className="btn btn-outline"
+                          style={{
+                            padding: "0.3rem 0.75rem",
+                            fontSize: "0.85rem",
+                          }}
+                        >
+                          Make {user.role === "ADMIN" ? "Registrant" : "Admin"}
                         </button>
                       </div>
                     </div>

@@ -2,34 +2,50 @@
 
 import { signIn } from "next-auth/react";
 import { useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { checkEmailExists } from "../actions";
 
 function SignInContent() {
   const [email, setEmail] = useState("");
   const [step, setStep] = useState<"EMAIL" | "OPTIONS">("EMAIL");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  
   const searchParams = useSearchParams();
+  const [errorMsg, setErrorMsg] = useState<string | null>(searchParams.get("error") ? "Authentication failed. Please check your credentials." : null);
+  const router = useRouter();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    setStep("OPTIONS");
-  };
-
-  const handleMagicLink = async () => {
+    setErrorMsg(null);
+    
     setLoading(true);
-    await signIn("nodemailer", { email, callbackUrl });
-    setLoading(false);
+    try {
+      const exists = await checkEmailExists(email);
+      if (!exists) {
+        router.push(`/auth/signup?email=${encodeURIComponent(email)}`);
+        return;
+      }
+      setStep("OPTIONS");
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg(null);
     setLoading(true);
-    await signIn("credentials", { email, password, callbackUrl });
+    const res = await signIn("credentials", { email, password, callbackUrl, redirect: false });
+    if (res?.error) {
+      setErrorMsg("Incorrect password. Please try again.");
+    } else if (res?.url) {
+      router.push(res.url);
+    }
     setLoading(false);
   };
 
@@ -38,6 +54,12 @@ function SignInContent() {
       <div className="rainbow-border card" style={{ maxWidth: '400px', width: '100%', padding: '2rem' }}>
         <h2 className="mb-4">Sign In</h2>
         
+        {errorMsg && (
+          <div className="mb-4 text-center p-2 rounded" style={{ color: "var(--color-error)", backgroundColor: "rgba(255,75,75,0.1)", border: "1px solid var(--color-error)" }}>
+            {errorMsg}
+          </div>
+        )}
+
         {step === "EMAIL" && (
           <form onSubmit={handleEmailSubmit}>
             <div className="form-group" style={{ textAlign: "left" }}>
@@ -78,17 +100,6 @@ function SignInContent() {
               </button>
             </form>
 
-            <div style={{ position: "relative", textAlign: "center", margin: "1rem 0" }}>
-              <hr style={{ border: "0", borderTop: "1px solid var(--color-border)" }} />
-              <span style={{ position: "absolute", top: "-10px", background: "var(--color-surface)", padding: "0 10px", color: "var(--color-text-muted)", fontSize: "0.9rem", left: "50%", transform: "translateX(-50%)" }}>
-                OR
-              </span>
-            </div>
-
-            <button onClick={handleMagicLink} className="btn btn-outline mt-2" style={{ width: '100%' }} disabled={loading}>
-              {loading ? "Sending..." : "Send Magic Link"}
-            </button>
-            
             <button onClick={() => setStep("EMAIL")} className="btn mt-4" style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", background: 'none', border: 'none', cursor: 'pointer' }}>
               &larr; Use a different email
             </button>

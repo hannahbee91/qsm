@@ -1,11 +1,8 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import NodemailerProvider from "next-auth/providers/nodemailer";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./lib/prisma";
 import bcrypt from "bcryptjs";
-import { transporter } from "./lib/email";
-
 export const {
   handlers: { GET, POST },
   auth,
@@ -15,18 +12,6 @@ export const {
   adapter: PrismaAdapter(prisma) as any,
   session: { strategy: "jwt" },
   providers: [
-    NodemailerProvider({
-      server: {
-        host: process.env.SMTP_HOST,
-        port: parseInt(process.env.SMTP_PORT || "587"),
-        secure: parseInt(process.env.SMTP_PORT || "587") === 465,
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
-        },
-      },
-        from: process.env.EMAIL_FROM,
-    }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {

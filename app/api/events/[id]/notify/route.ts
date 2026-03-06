@@ -64,15 +64,15 @@ export async function POST(
         html: cancellationEmail(event),
       });
     } else if (type === "FORM") {
-      const { generateMagicLink } = await import("@/lib/magic-link");
+      const baseUrl = process.env.NEXTAUTH_URL || process.env.AUTH_URL || "http://localhost:3000";
       for (const reg of event.registrations) {
         if (!reg.user.email) continue;
-        const magicLink = await generateMagicLink(reg.user.email, `/event/${event.id}/feedback`);
+        const linkUrl = `${baseUrl}/event/${event.id}/feedback`;
         await transporter.sendMail({
           from: process.env.EMAIL_FROM,
           to: reg.user.email,
           subject: `Feedback Form: ${event.title}`,
-          html: feedbackFormEmail(event, magicLink),
+          html: feedbackFormEmail(event, linkUrl),
         });
       }
     } else {

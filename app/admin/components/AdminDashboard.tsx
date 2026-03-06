@@ -59,11 +59,13 @@ export default function AdminDashboard({ initialEvents }: { initialEvents: Event
         body: JSON.stringify({ title: newEventTitle, date: new Date(newEventDate).toISOString(), address: newEventAddress || null })
       });
       if (res.ok) {
+        const newEvent = await res.json();
+        newEvent._count = { registrations: 0, matchResponses: 0 };
+        setEvents(prev => [...prev, newEvent].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()));
         setNewEventTitle("");
         setNewEventDate("");
         setNewEventAddress("");
         showAlert("Success", "Event created successfully");
-        await refreshEvents();
       } else {
         showAlert("Error", "Failed to create event");
       }
@@ -107,7 +109,7 @@ export default function AdminDashboard({ initialEvents }: { initialEvents: Event
         });
         if (res.ok) {
           showAlert("Success", `Event marked as ${status}`);
-          await refreshEvents();
+          setEvents(prev => prev.map(e => e.id === id ? { ...e, status } : e));
         } else {
           showAlert("Error", "Failed to update status");
         }
@@ -163,7 +165,22 @@ export default function AdminDashboard({ initialEvents }: { initialEvents: Event
         const res = await fetch(`/api/admin/registrations/${registrationId}`, { method: "DELETE" });
         if (res.ok) {
           showAlert("Success", "Registration removed");
-          await refreshEvents();
+          
+          setRegistrantsMap(prev => {
+            const newMap = { ...prev };
+            Object.keys(newMap).forEach(eventId => {
+              newMap[eventId] = newMap[eventId].filter(reg => reg.id !== registrationId);
+            });
+            return newMap;
+          });
+          
+          setEvents(prev => prev.map(evt => {
+            const regs = registrantsMap[evt.id];
+            if (regs && regs.some(r => r.id === registrationId)) {
+                return { ...evt, _count: { ...evt._count, registrations: evt._count.registrations - 1 } };
+            }
+            return evt;
+          }));
         } else {
           showAlert("Error", "Failed to remove registration");
         }
@@ -183,7 +200,19 @@ export default function AdminDashboard({ initialEvents }: { initialEvents: Event
         });
         if (res.ok) {
           showAlert("Success", `User ${currentStatus ? "unsuspended" : "suspended"}`);
-          await refreshEvents(); // Not perfect but refreshes state
+          
+          setRegistrantsMap(prev => {
+            const newMap = { ...prev };
+            Object.keys(newMap).forEach(eventId => {
+              newMap[eventId] = newMap[eventId].map(reg => {
+                if (reg.user.id === userId) {
+                  return { ...reg, user: { ...reg.user, suspended: !currentStatus } };
+                }
+                return reg;
+              });
+            });
+            return newMap;
+          });
         } else {
           showAlert("Error", "Failed to update user");
         }

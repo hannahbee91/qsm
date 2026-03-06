@@ -33,15 +33,18 @@ export default async function RootLayout({
                   {session.user.role === "ADMIN" && (
                     <Link href="/admin" className="nav-link">Admin Dashboard</Link>
                   )}
-                  {session.user.role === "REGISTRANT" && (
-                    <Link href="/registrant" className="nav-link">My Dashboard</Link>
-                  )}
+                  <Link href="/registrant" className="nav-link">My Dashboard</Link>
                   <SignOutButton />
                 </>
               ) : (
-                <Link href="/auth/signin" className="btn btn-primary">
-                  Sign In
-                </Link>
+                <div className="flex gap-2 items-center">
+                  <Link href="/auth/signin" className="btn btn-outline">
+                    Sign In
+                  </Link>
+                  <Link href="/auth/signup" className="btn btn-primary">
+                    Sign Up
+                  </Link>
+                </div>
               )}
             </div>
           </nav>

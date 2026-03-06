@@ -62,8 +62,8 @@ export async function POST(req: NextRequest) {
     // Auto-notify all non-suspended registrants about the new event
     try {
       const { transporter } = await import("@/lib/email");
-      const { generateMagicLink } = await import("@/lib/magic-link");
       const { newEventAnnouncementEmail } = await import("@/lib/email-templates");
+      const baseUrl = process.env.NEXTAUTH_URL || process.env.AUTH_URL || "http://localhost:3000";
 
       const registrants = await prisma.user.findMany({
         where: { role: "REGISTRANT", suspended: false, notifyNewEvents: true, email: { not: null } }
@@ -71,12 +71,12 @@ export async function POST(req: NextRequest) {
 
       for (const user of registrants) {
         if (!user.email) continue;
-        const magicLink = await generateMagicLink(user.email, "/registrant");
+        const linkUrl = `${baseUrl}/registrant`;
         await transporter.sendMail({
           from: process.env.EMAIL_FROM,
           to: user.email,
           subject: `New Event: ${event.title}`,
-          html: newEventAnnouncementEmail(event, magicLink),
+          html: newEventAnnouncementEmail(event, linkUrl),
         });
       }
     } catch (emailError) {

@@ -97,13 +97,12 @@ export function cancellationEmail(event: { title: string; date: Date }): string 
   `);
 }
 
-export function feedbackFormEmail(event: { title: string }, magicLink: string): string {
+export function feedbackFormEmail(event: { title: string }, linkUrl: string): string {
   return layout(`
     <h2 style="margin:24px 0 8px;font-size:20px;color:#FFD93D;">📝 Share Your Feedback</h2>
     <p style="margin:0 0 16px;font-size:15px;color:#A1A1B5;">Thanks for attending <strong>${event.title}</strong>! Fill out your feedback form so we can find your matches.</p>
     <p style="margin:0 0 8px;font-size:14px;color:#A1A1B5;">Click below to sign in and go directly to your form:</p>
-    ${button('Open Feedback Form →', magicLink)}
-    <p style="margin:0;font-size:12px;color:#A1A1B5;text-align:center;">This link expires in 24 hours.</p>
+    ${button('Open Feedback Form →', linkUrl)}
   `);
 }
 

@@ -11,7 +11,6 @@ export default async function AdminUsersPage() {
   }
 
   const users = await prisma.user.findMany({
-    where: { role: "REGISTRANT" },
     orderBy: { name: "asc" },
     select: {
       id: true,
@@ -19,6 +18,7 @@ export default async function AdminUsersPage() {
       email: true,
       age: true,
       pronouns: true,
+      role: true,
       suspended: true,
       contactEmail: true,
       phoneNumber: true,
