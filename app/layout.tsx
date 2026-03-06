@@ -6,6 +6,8 @@ import { auth } from "@/auth";
 import SignOutButton from "./components/SignOutButton";
 import { ModalProvider } from "./components/ModalProvider";
 
+import { Footer } from "./components/Footer";
+
 export const metadata: Metadata = {
   title: `${process.env.NEXT_PUBLIC_APP_NAME || "Queer Speed Meet"}- Speed Meeting`,
   description: `${process.env.NEXT_PUBLIC_APP_NAME || "Queer Speed Meet"} Speed Meeting Service - Make new connections.`,
@@ -51,6 +53,7 @@ export default async function RootLayout({
           <main>
             {children}
           </main>
+          <Footer />
           </ModalProvider>
         </SessionProvider>
       </body>

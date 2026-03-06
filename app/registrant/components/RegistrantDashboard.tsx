@@ -217,20 +217,6 @@ export default function RegistrantDashboard({ initialUser, initialEvents, pendin
               </div>
             </div>
           )}
-
-          {/* Ko-fi Donation Section */}
-          <div className="mt-4" style={{ borderTop: "1px solid var(--color-border)", paddingTop: "1.5rem", textAlign: "center" }}>
-            <p style={{ fontSize: "1rem", marginBottom: "0.75rem" }}>☕ Like {process.env.NEXT_PUBLIC_APP_NAME || "Queer Speed Meet"}? Donate to show your support!</p>
-            <a
-              href={`https://ko-fi.com/${process.env.NEXT_PUBLIC_KO_FI_USERNAME || "hannahbee91"}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-primary"
-              style={{ padding: "0.5rem 1.5rem", fontSize: "0.95rem" }}
-            >
-              Donate on Ko-fi
-            </a>
-          </div>
         </div>
       )
     }

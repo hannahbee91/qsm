@@ -15,6 +15,15 @@ function SignUpContent() {
   const [email, setEmail] = useState(searchParams.get("email") || "");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  
+  const [age, setAge] = useState("");
+  const [pronouns, setPronouns] = useState("");
+  const [isOver18, setIsOver18] = useState(false);
+  const [contactEmail, setContactEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [instagram, setInstagram] = useState("");
+  const [discord, setDiscord] = useState("");
+
   const [passwordValidation, setPasswordValidation] = useState<PasswordValidationResult>(validatePasswordRequirements(""));
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -43,7 +52,18 @@ function SignUpContent() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ 
+          name, 
+          email, 
+          password,
+          age,
+          pronouns,
+          isOver18,
+          contactEmail,
+          phoneNumber,
+          instagram,
+          discord
+        }),
       });
 
       if (!res.ok) {
@@ -92,7 +112,7 @@ function SignUpContent() {
           </div>
 
           <div className="form-group" style={{ textAlign: "left" }}>
-            <label className="form-label">Email Address</label>
+            <label className="form-label">Email Address *</label>
             <input 
               type="email" 
               className="form-input" 
@@ -101,6 +121,92 @@ function SignUpContent() {
               required 
               disabled={loading}
             />
+          </div>
+
+          <div className="responsive-grid-half">
+            <div className="form-group" style={{ textAlign: "left" }}>
+              <label className="form-label">Age *</label>
+              <input 
+                type="number" 
+                className="form-input" 
+                value={age} 
+                onChange={e => setAge(e.target.value)} 
+                required 
+                disabled={loading}
+              />
+            </div>
+            <div className="form-group" style={{ textAlign: "left" }}>
+              <label className="form-label">Pronouns</label>
+              <input 
+                type="text" 
+                className="form-input" 
+                value={pronouns} 
+                onChange={e => setPronouns(e.target.value)} 
+                placeholder="e.g. they/them"
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          <div className="mt-4 mb-2 text-left">
+            <h3 style={{ fontSize: '1rem', marginBottom: '0.25rem' }}>Contact Info *</h3>
+            <p className="form-label" style={{ marginBottom: "0.5rem" }}>Please provide at least one method of contact for matches.</p>
+          </div>
+          
+          <div className="responsive-grid-half">
+            <div className="form-group" style={{ textAlign: "left" }}>
+              <label className="form-label">Contact Email</label>
+              <input 
+                type="email" 
+                className="form-input" 
+                value={contactEmail} 
+                onChange={e => setContactEmail(e.target.value)} 
+                disabled={loading}
+              />
+            </div>
+            <div className="form-group" style={{ textAlign: "left" }}>
+              <label className="form-label">Phone Number</label>
+              <input 
+                type="tel" 
+                className="form-input" 
+                value={phoneNumber} 
+                onChange={e => setPhoneNumber(e.target.value)} 
+                disabled={loading}
+              />
+            </div>
+            <div className="form-group" style={{ textAlign: "left" }}>
+              <label className="form-label">Instagram</label>
+              <input 
+                type="text" 
+                className="form-input" 
+                value={instagram} 
+                onChange={e => setInstagram(e.target.value)} 
+                disabled={loading}
+              />
+            </div>
+            <div className="form-group" style={{ textAlign: "left" }}>
+              <label className="form-label">Discord</label>
+              <input 
+                type="text" 
+                className="form-input" 
+                value={discord} 
+                onChange={e => setDiscord(e.target.value)} 
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          <div style={{ padding: '0.75rem', backgroundColor: 'var(--color-surface-hover)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', textAlign: 'left', marginBottom: '1rem' }}>
+            <label className="flex items-center gap-2" style={{ cursor: 'pointer', fontSize: '0.9rem' }}>
+              <input 
+                type="checkbox" 
+                checked={isOver18} 
+                onChange={e => setIsOver18(e.target.checked)}
+                required
+                style={{ width: '16px', height: '16px', accentColor: '#A66CFF' }}
+              />
+              I confirm that I am at least 18 years of age.
+            </label>
           </div>
 
           <div className="form-group" style={{ textAlign: "left" }}>
