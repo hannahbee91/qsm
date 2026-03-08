@@ -5,6 +5,8 @@
 
 const RAINBOW_GRADIENT = 'linear-gradient(90deg, #FF6B6B, #FFB471, #FFD93D, #6BCB77, #4D96FF, #A66CFF)';
 
+import { formatEventTime } from "./time-utils";
+
 function layout(content: string): string {
   return `<!DOCTYPE html>
 <html>
@@ -57,7 +59,7 @@ function infoBox(label: string, value: string): string {
 // ============ EMAIL BUILDERS ============
 
 export function newEventAnnouncementEmail(event: { title: string; date: Date; address: string | null }, dashboardLink: string): string {
-  const dateStr = event.date.toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  const dateStr = formatEventTime(event.date);
   return layout(`
     <h2 style="margin:24px 0 8px;font-size:20px;color:#FFD447;">✨ New Event Announced!</h2>
     <p style="margin:0 0 16px;font-size:15px;color:#A1A1B5;">A new speed meet event has been scheduled. Sign up before spots fill up!</p>

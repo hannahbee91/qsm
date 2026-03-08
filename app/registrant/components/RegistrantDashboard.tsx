@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useModal } from "@/app/components/ModalProvider";
 import Link from "next/link";
 import { ResponsiveTabs } from "@/app/components/ResponsiveTabs";
+import { formatEventTime } from "@/lib/time-utils";
 
 type User = any;
 type Event = any;
@@ -168,7 +169,7 @@ export default function RegistrantDashboard({ initialUser, initialEvents, pendin
                 return (
                   <div key={event.id} style={{ border: "1px solid var(--color-border)", padding: "1rem", borderRadius: "var(--radius-sm)" }}>
                     <h3 style={{ margin: 0 }}>{event.title}</h3>
-                    <p style={{ color: "var(--color-text-muted)" }}>{dateObj.toLocaleString()}</p>
+                    <p style={{ color: "var(--color-text-muted)" }}>{formatEventTime(dateObj)}</p>
                     <div className="mt-1">
                       {isRegistered ? (
                         <span style={{ color: "var(--color-success)", fontWeight: 500 }}>✓ Registered</span>
@@ -199,7 +200,7 @@ export default function RegistrantDashboard({ initialUser, initialEvents, pendin
                   <div key={event.id} className="responsive-flex-stack" style={{ border: "1px solid var(--color-border)", padding: "1rem", borderRadius: "var(--radius-sm)" }}>
                     <div>
                       <h3 style={{ margin: 0 }}>{event.title}</h3>
-                      <p style={{ color: "var(--color-text-muted)", fontSize: "0.9rem" }}>{new Date(event.date).toLocaleString()}</p>
+                      <p style={{ color: "var(--color-text-muted)", fontSize: "0.9rem" }}>{formatEventTime(event.date)}</p>
                     </div>
                     <div>
                       {event.hasResponded ? (

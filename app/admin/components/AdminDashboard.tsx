@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useModal } from "@/app/components/ModalProvider";
 import { ResponsiveTabs } from "@/app/components/ResponsiveTabs";
+import { formatEventTime } from "@/lib/time-utils";
 
 type Event = any;
 
@@ -338,7 +339,7 @@ export default function AdminDashboard({ initialEvents }: { initialEvents: Event
                         </span>
                       </h3>
                       <p style={{ color: "var(--color-text-muted)", fontSize: '0.9rem' }}>
-                        {new Date(event.date).toLocaleString()} • {event._count.registrations} Registrants • {event._count.matchResponses} Responses
+                        {formatEventTime(event.date)} • {event._count.registrations} Registrants • {event._count.matchResponses} Responses
                       </p>
                     </div>
                     <div>
