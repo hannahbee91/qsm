@@ -8,7 +8,6 @@ import { validatePasswordRequirements, PasswordValidationResult } from "@/lib/pa
 import { PasswordRequirements } from "@/components/PasswordRequirements";
 
 function SignUpContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   
   const [name, setName] = useState("");
@@ -82,8 +81,7 @@ function SignUpContent() {
         throw new Error(signInRes.error);
       }
 
-      router.push("/registrant");
-      router.refresh();
+      window.location.href = "/registrant";
     } catch (err: any) {
       setError(err.message);
       setLoading(false);

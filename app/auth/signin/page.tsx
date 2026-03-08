@@ -43,8 +43,8 @@ function SignInContent() {
     const res = await signIn("credentials", { email, password, callbackUrl, redirect: false });
     if (res?.error) {
       setErrorMsg("Incorrect password. Please try again.");
-    } else if (res?.url) {
-      router.push(res.url);
+    } else if (res?.ok) {
+      window.location.href = res?.url || callbackUrl;
     }
     setLoading(false);
   };

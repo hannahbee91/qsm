@@ -10,7 +10,6 @@ export default function SetupForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,8 +39,7 @@ export default function SetupForm() {
         throw new Error(signInRes.error);
       }
 
-      router.push("/admin");
-      router.refresh();
+      window.location.href = "/admin";
     } catch (err: any) {
       setError(err.message);
       setLoading(false);
