@@ -17,5 +17,5 @@ export function formatEventTime(date: string | Date | number): string {
     timeZoneName: "short"
   });
 
-  return `${formatted} (${timeZone})`;
+  return `${formatted}`;
 }
