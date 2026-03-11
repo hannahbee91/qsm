@@ -280,7 +280,7 @@ Resources:
             Command: [ "CMD-SHELL", !Sub "pg_isready -U ${DbUser} -d ${DbName}" ]
             Interval: 10
             Timeout: 5
-            Retries: 12
+            Retries: 10
             StartPeriod: 60
           LogConfiguration:
             LogDriver: awslogs
