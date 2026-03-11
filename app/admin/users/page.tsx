@@ -31,7 +31,7 @@ export default async function AdminUsersPage() {
   return (
     <div>
       <h1 className="mb-4">Manage Users</h1>
-      <AdminUsersManager initialUsers={users} />
+      <AdminUsersManager initialUsers={users} currentUserId={session.user!.id} />
     </div>
   );
 }

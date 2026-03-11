@@ -31,7 +31,7 @@ export default async function AdminPage() {
           </Link>
         </div>
       </div>
-      <AdminDashboard initialEvents={events} />
+      <AdminDashboard initialEvents={events} currentUserId={session.user!.id} />
     </div>
   );
 }

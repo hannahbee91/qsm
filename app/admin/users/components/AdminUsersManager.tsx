@@ -19,7 +19,7 @@ type User = {
   _count: { registrations: number };
 };
 
-export default function AdminUsersManager({ initialUsers }: { initialUsers: User[] }) {
+export default function AdminUsersManager({ initialUsers, currentUserId }: { initialUsers: User[], currentUserId: string }) {
   const [users, setUsers] = useState<User[]>(initialUsers);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "active" | "suspended">("all");
@@ -217,28 +217,32 @@ export default function AdminUsersManager({ initialUsers }: { initialUsers: User
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <button
-                          onClick={() => handleSuspendUser(user.id, user.suspended)}
-                          className="btn btn-outline"
-                          style={{
-                            padding: "0.3rem 0.75rem",
-                            fontSize: "0.85rem",
-                            color: user.suspended ? "var(--color-success)" : "var(--color-error)",
-                            borderColor: user.suspended ? "var(--color-success)" : "var(--color-error)",
-                          }}
-                        >
-                          {user.suspended ? "Unsuspend User" : "Suspend User"}
-                        </button>
-                        <button
-                          onClick={() => handleRoleChange(user.id, user.role)}
-                          className="btn btn-outline"
-                          style={{
-                            padding: "0.3rem 0.75rem",
-                            fontSize: "0.85rem",
-                          }}
-                        >
-                          Make {user.role === "ADMIN" ? "Registrant" : "Admin"}
-                        </button>
+                        {user.id !== currentUserId && (
+                          <>
+                            <button
+                              onClick={() => handleSuspendUser(user.id, user.suspended)}
+                              className="btn btn-outline"
+                              style={{
+                                padding: "0.3rem 0.75rem",
+                                fontSize: "0.85rem",
+                                color: user.suspended ? "var(--color-success)" : "var(--color-error)",
+                                borderColor: user.suspended ? "var(--color-success)" : "var(--color-error)",
+                              }}
+                            >
+                              {user.suspended ? "Unsuspend User" : "Suspend User"}
+                            </button>
+                            <button
+                              onClick={() => handleRoleChange(user.id, user.role)}
+                              className="btn btn-outline"
+                              style={{
+                                padding: "0.3rem 0.75rem",
+                                fontSize: "0.85rem",
+                              }}
+                            >
+                              Make {user.role === "ADMIN" ? "Registrant" : "Admin"}
+                            </button>
+                          </>
+                        )}
                       </div>
                     </div>
                   )}

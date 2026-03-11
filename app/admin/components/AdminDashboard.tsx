@@ -7,7 +7,7 @@ import { formatEventTime } from "@/lib/time-utils";
 
 type Event = any;
 
-export default function AdminDashboard({ initialEvents }: { initialEvents: Event[] }) {
+export default function AdminDashboard({ initialEvents, currentUserId }: { initialEvents: Event[], currentUserId: string }) {
   const [events, setEvents] = useState<Event[]>(initialEvents);
   const [registrantsMap, setRegistrantsMap] = useState<Record<string, any[]>>({});
   
@@ -397,7 +397,9 @@ export default function AdminDashboard({ initialEvents }: { initialEvents: Event
                               </div>
                               <div className="flex gap-2">
                                   <button onClick={() => handleRemoveRegistration(reg.id)} className="btn btn-outline" style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem', color: 'var(--color-error)', borderColor: 'var(--color-error)' }}>Remove Registration</button>
-                                  <button onClick={() => handleSuspendUser(reg.user.id, reg.user.suspended)} className="btn btn-outline" style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem' }}>{reg.user.suspended ? 'Unsuspend User' : 'Suspend User'}</button>
+                                  {reg.user.id !== currentUserId && (
+                                    <button onClick={() => handleSuspendUser(reg.user.id, reg.user.suspended)} className="btn btn-outline" style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem' }}>{reg.user.suspended ? 'Unsuspend User' : 'Suspend User'}</button>
+                                  )}
                               </div>
                             </div>
                           ))}

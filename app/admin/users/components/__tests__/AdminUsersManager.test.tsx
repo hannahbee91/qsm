@@ -65,7 +65,7 @@ describe('AdminUsersManager', () => {
   });
 
   it('renders all users initially', () => {
-    render(<AdminUsersManager initialUsers={mockUsers} />);
+    render(<AdminUsersManager initialUsers={mockUsers} currentUserId="test-admin-id" />);
     
     expect(screen.getByText('All Registrants (2)')).toBeInTheDocument();
     expect(screen.getByText('Alice Registrant')).toBeInTheDocument();
@@ -73,7 +73,7 @@ describe('AdminUsersManager', () => {
   });
 
   it('displays the ADMIN badge for admin users', () => {
-    render(<AdminUsersManager initialUsers={mockUsers} />);
+    render(<AdminUsersManager initialUsers={mockUsers} currentUserId="test-admin-id" />);
     
     // Bob should have an ADMIN badge
     const adminBadge = screen.getByText('ADMIN');
@@ -81,7 +81,7 @@ describe('AdminUsersManager', () => {
   });
 
   it('allows expanding a user to see more details and actions', () => {
-    render(<AdminUsersManager initialUsers={mockUsers} />);
+    render(<AdminUsersManager initialUsers={mockUsers} currentUserId="test-admin-id" />);
     
     const aliceRow = screen.getByText('Alice Registrant');
     fireEvent.click(aliceRow);
@@ -92,7 +92,7 @@ describe('AdminUsersManager', () => {
   });
 
   it('calls the role toggle API when the role change button is clicked', async () => {
-    render(<AdminUsersManager initialUsers={mockUsers} />);
+    render(<AdminUsersManager initialUsers={mockUsers} currentUserId="test-admin-id" />);
     
     // Open Alice
     fireEvent.click(screen.getByText('Alice Registrant'));
@@ -114,7 +114,7 @@ describe('AdminUsersManager', () => {
   });
 
   it('calls the role toggle API with REGISTRANT for an admin user', async () => {
-    render(<AdminUsersManager initialUsers={mockUsers} />);
+    render(<AdminUsersManager initialUsers={mockUsers} currentUserId="test-admin-id" />);
     
     // Open Bob
     fireEvent.click(screen.getByText('Bob Admin'));
