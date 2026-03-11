@@ -61,7 +61,8 @@ export default function AdminDashboard({ initialEvents, currentUserId }: { initi
       });
       if (res.ok) {
         const newEvent = await res.json();
-        newEvent._count = { registrations: 0, matchResponses: 0 };
+        newEvent._count = { registrations: 0 };
+        newEvent.uniqueMatchResponses = 0;
         setEvents(prev => [...prev, newEvent].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()));
         setNewEventTitle("");
         setNewEventDate("");
@@ -339,7 +340,7 @@ export default function AdminDashboard({ initialEvents, currentUserId }: { initi
                         </span>
                       </h3>
                       <p style={{ color: "var(--color-text-muted)", fontSize: '0.9rem' }}>
-                        {formatEventTime(event.date)} • {event._count.registrations} Registrants • {event._count.matchResponses} Responses
+                        {formatEventTime(event.date)} • {event._count.registrations} Registrants • {event.uniqueMatchResponses} Responses
                       </p>
                     </div>
                     <div>

@@ -14,9 +14,23 @@ export default async function AdminPage() {
   const events = await prisma.event.findMany({
     orderBy: { date: "desc" },
     include: {
-      _count: { select: { registrations: true, matchResponses: true } },
+      _count: { select: { registrations: true } },
     }
   });
+
+  const uniqueRespondersCounts = await prisma.matchResponse.groupBy({
+    by: ['eventId', 'sourceUserId'],
+  });
+
+  const countMap: Record<string, number> = {};
+  for (const res of uniqueRespondersCounts) {
+    countMap[res.eventId] = (countMap[res.eventId] || 0) + 1;
+  }
+
+  const eventsWithUniqueCounts = events.map(event => ({
+    ...event,
+    uniqueMatchResponses: countMap[event.id] || 0
+  }));
 
   return (
     <div>
@@ -31,7 +45,7 @@ export default async function AdminPage() {
           </Link>
         </div>
       </div>
-      <AdminDashboard initialEvents={events} currentUserId={session.user!.id} />
+      <AdminDashboard initialEvents={eventsWithUniqueCounts} currentUserId={session.user!.id} />
     </div>
   );
 }

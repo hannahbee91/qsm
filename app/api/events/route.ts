@@ -16,10 +16,27 @@ export async function GET(req: NextRequest) {
     const events = await prisma.event.findMany({
       orderBy: { date: "asc" },
       include: {
-        _count: { select: { registrations: true, matchResponses: true } }
+        _count: { select: { registrations: true } } // Don't rely on _count for matchResponses anymore
       }
     });
-    return NextResponse.json(events);
+
+    // Group by eventId and sourceUserId to find the number of unique responders
+    const uniqueRespondersCounts = await prisma.matchResponse.groupBy({
+      by: ['eventId', 'sourceUserId'],
+    });
+
+    // Count how many sourceUserIds exist for each eventId
+    const countMap: Record<string, number> = {};
+    for (const res of uniqueRespondersCounts) {
+      countMap[res.eventId] = (countMap[res.eventId] || 0) + 1;
+    }
+
+    const eventsWithUniqueCounts = events.map(event => ({
+      ...event,
+      uniqueMatchResponses: countMap[event.id] || 0
+    }));
+
+    return NextResponse.json(eventsWithUniqueCounts);
   } else {
     // Registrants can see UPCOMING events and events they registered for
     const events = await prisma.event.findMany({
