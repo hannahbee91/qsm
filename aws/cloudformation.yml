@@ -1,0 +1,361 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation template for deploying Queer Speed Meet (QSM) on ECS Fargate with EFS for PostgreSQL'
+
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: The VPC ID where the resources will be deployed
+  Subnet1Id:
+    Type: AWS::EC2::Subnet::Id
+    Description: ID of the first Subnet (should be public for cost-savings)
+  Subnet2Id:
+    Type: AWS::EC2::Subnet::Id
+    Description: ID of the second Subnet (should be public for cost-savings)
+  DomainName:
+    Type: String
+    Description: The domain name for the application (e.g., qsm.example.com)
+  HostedZoneId:
+    Type: AWS::Route53::HostedZone::Id
+    Description: The Route53 Hosted Zone ID for the domain
+  DbUser:
+    Type: String
+    Default: root
+    Description: PostgreSQL username
+  DbName:
+    Type: String
+    Default: qsm
+    Description: PostgreSQL database name
+  PostgresPassword:
+    Type: String
+    NoEcho: true
+    Description: PostgreSQL password
+  NextAuthSecret:
+    Type: String
+    NoEcho: true
+    Description: A random secret for NextAuth
+  SmtpHost:
+    Type: String
+    Description: SMTP Host
+  SmtpPort:
+    Type: String
+    Default: '465'
+    Description: SMTP Port
+  SmtpUser:
+    Type: String
+    Description: SMTP User
+  SmtpPass:
+    Type: String
+    NoEcho: true
+    Description: SMTP Password
+  EmailFrom:
+    Type: String
+    Description: 'Email Sender (e.g., App Name <you@example.com>)'
+  NextPublicAppName:
+    Type: String
+    Default: 'Queer Speed Meet'
+    Description: The name of the App
+  NextPublicKofiUsername:
+    Type: String
+    Default: ''
+    Description: Ko-fi username for the UI
+  NextPublicTimezone:
+    Type: String
+    Default: 'America/Los_Angeles'
+    Description: Timezone for the event
+  SupportEmail:
+    Type: String
+    Description: Support email displayed in the app
+
+Resources:
+  # --------------------------------------------------------------------------
+  # IAM Roles
+  # --------------------------------------------------------------------------
+  TaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [ecs-tasks.amazonaws.com]
+            Action: ['sts:AssumeRole']
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  TaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [ecs-tasks.amazonaws.com]
+            Action: ['sts:AssumeRole']
+
+  # --------------------------------------------------------------------------
+  # Security Groups
+  # --------------------------------------------------------------------------
+  AlbSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow HTTP/HTTPS to ALB
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+
+  EcsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow ALB to ECS and ECS to ECS
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          SourceSecurityGroupId: !Ref AlbSecurityGroup
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          SourceSecurityGroupId: !Ref AlbSecurityGroup
+          Description: Allow within ECS # Temporary/unused rule, self-referencing is sometimes tricky in CF
+
+  EfsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow ECS to EFS
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 2049
+          ToPort: 2049
+          SourceSecurityGroupId: !Ref EcsSecurityGroup
+
+  # --------------------------------------------------------------------------
+  # EFS configuration
+  # --------------------------------------------------------------------------
+  EfsFileSystem:
+    Type: AWS::EFS::FileSystem
+    Properties:
+      PerformanceMode: generalPurpose
+      ThroughputMode: bursting
+      Encrypted: true
+
+  MountTarget1:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EfsFileSystem
+      SubnetId: !Ref Subnet1Id
+      SecurityGroups:
+        - !Ref EfsSecurityGroup
+
+  MountTarget2:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EfsFileSystem
+      SubnetId: !Ref Subnet2Id
+      SecurityGroups:
+        - !Ref EfsSecurityGroup
+
+  # --------------------------------------------------------------------------
+  # Load Balancing & Domain
+  # --------------------------------------------------------------------------
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref DomainName
+      ValidationMethod: DNS
+      DomainValidationOptions:
+        - DomainName: !Ref DomainName
+          HostedZoneId: !Ref HostedZoneId
+
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Subnets:
+        - !Ref Subnet1Id
+        - !Ref Subnet2Id
+      SecurityGroups:
+        - !Ref AlbSecurityGroup
+
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      VpcId: !Ref VpcId
+      Port: 3000
+      Protocol: HTTP
+      TargetType: ip
+      HealthCheckPath: /api/auth/csrf # NextAuth path that indicates app is alive
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 4
+
+  LoadBalancerListenerHTTP:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: redirect
+          RedirectConfig:
+            Port: '443'
+            Protocol: 'HTTPS'
+            StatusCode: 'HTTP_301'
+
+  LoadBalancerListenerHTTPS:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 443
+      Protocol: HTTPS
+      Certificates:
+        - CertificateArn: !Ref Certificate
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+
+  DnsRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Ref DomainName
+      Type: A
+      AliasTarget:
+        HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
+        DNSName: !GetAtt LoadBalancer.DNSName
+        EvaluateTargetHealth: true
+
+  # --------------------------------------------------------------------------
+  # ECS Cluster & Services
+  # --------------------------------------------------------------------------
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /ecs/${AWS::StackName}
+      RetentionInDays: 30
+
+  EcsCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Ref AWS::StackName
+
+  EcsTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      RequiresCompatibilities:
+        - FARGATE
+      NetworkMode: awsvpc
+      Cpu: '1024'
+      Memory: '2048'
+      ExecutionRoleArn: !GetAtt TaskExecutionRole.Arn
+      TaskRoleArn: !GetAtt TaskRole.Arn
+      Volumes:
+        - Name: efs-postgres-data
+          EFSVolumeConfiguration:
+            FilesystemId: !Ref EfsFileSystem
+      ContainerDefinitions:
+        - Name: db
+          Image: postgres:15
+          Environment:
+            - Name: POSTGRES_USER
+              Value: !Ref DbUser
+            - Name: POSTGRES_PASSWORD
+              Value: !Ref PostgresPassword
+            - Name: POSTGRES_DB
+              Value: !Ref DbName
+          MountPoints:
+            - SourceVolume: efs-postgres-data
+              ContainerPath: /var/lib/postgresql/data
+          HealthCheck:
+            Command: [ "CMD-SHELL", !Sub "pg_isready -U ${DbUser} -d ${DbName}" ]
+            Interval: 10
+            Timeout: 5
+            Retries: 12
+            StartPeriod: 60
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: db
+        - Name: app
+          Image: hannahbee91/qsm:latest
+          DependsOn:
+            - ContainerName: db
+              Condition: HEALTHY
+          PortMappings:
+            - ContainerPort: 3000
+          Environment:
+            - Name: DATABASE_URL
+              Value: !Sub "postgresql://${DbUser}:${PostgresPassword}@localhost:5432/${DbName}?schema=public"
+            - Name: AUTH_TRUST_HOST
+              Value: "true"
+            - Name: NEXTAUTH_URL
+              Value: !Sub "https://${DomainName}"
+            - Name: AUTH_URL
+              Value: !Sub "https://${DomainName}"
+            - Name: NEXTAUTH_SECRET
+              Value: !Ref NextAuthSecret
+            - Name: SMTP_HOST
+              Value: !Ref SmtpHost
+            - Name: SMTP_PORT
+              Value: !Ref SmtpPort
+            - Name: SMTP_USER
+              Value: !Ref SmtpUser
+            - Name: SMTP_PASS
+              Value: !Ref SmtpPass
+            - Name: EMAIL_FROM
+              Value: !Ref EmailFrom
+            - Name: NEXT_PUBLIC_APP_NAME
+              Value: !Ref NextPublicAppName
+            - Name: NEXT_PUBLIC_KO_FI_USERNAME
+              Value: !Ref NextPublicKofiUsername
+            - Name: NEXT_PUBLIC_TIMEZONE
+              Value: !Ref NextPublicTimezone
+            - Name: SUPPORT_EMAIL
+              Value: !Ref SupportEmail
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: app
+
+  EcsService:
+    Type: AWS::ECS::Service
+    DependsOn:
+      - LoadBalancerListenerHTTPS
+      - MountTarget1
+      - MountTarget2
+    Properties:
+      Cluster: !Ref EcsCluster
+      TaskDefinition: !Ref EcsTaskDefinition
+      LaunchType: FARGATE
+      DesiredCount: 1
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !Ref EcsSecurityGroup
+          Subnets:
+            - !Ref Subnet1Id
+            - !Ref Subnet2Id
+      LoadBalancers:
+        - ContainerName: app
+          ContainerPort: 3000
+          TargetGroupArn: !Ref TargetGroup
+
+Outputs:
+  AppUrl:
+    Description: The URL to access the application
+    Value: !Sub "https://${DomainName}"
