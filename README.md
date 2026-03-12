@@ -154,6 +154,7 @@ aws cloudformation deploy \
       SmtpUser=user \
       SmtpPass=pass \
       EmailFrom="App Name <you@example.com>" \
+      SupportEmail="[EMAIL_ADDRESS]" \
   --capabilities CAPABILITY_IAM
 ```
 
